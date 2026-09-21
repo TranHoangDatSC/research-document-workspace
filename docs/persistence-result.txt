@@ -1,0 +1,4 @@
+﻿PostgreSQL: PASS
+MongoDB: PASS
+MinIO: PASS
+Persistence verify: PASS
