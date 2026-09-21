@@ -1,0 +1,30 @@
+Liveness: PASS
+Readiness: PASS
+Create/read project: PASS
+List projects: PASS
+Missing project 404: PASS
+Blank name 422: PASS
+Upload 201: PASS
+Upload SHA256: PASS
+Upload 201: PASS
+Upload SHA256: PASS
+Duplicate filenames use distinct objects: PASS
+Upload missing project 404: PASS
+Oversized file 413: PASS
+Unsupported extension 415: PASS
+Empty file 422: PASS
+Malformed metadata 422: PASS
+Rejected requests create no extra rows: PASS
+Missing document 404: PASS
+Missing download 404: PASS
+before project: PASS
+before metadata 1: PASS
+before flexible fields 1: PASS
+before download SHA256 1: PASS
+before metadata 2: PASS
+before flexible fields 2: PASS
+before download SHA256 2: PASS
+PostgreSQL ready row: PASS
+MongoDB metadata row: PASS
+MinIO object size: PASS
+DAY 2 BEFORE: PASS

@@ -1,0 +1,13 @@
+Readiness recovered: PASS
+Failed upload leaves no MongoDB metadata or MinIO object: PASS
+recovery project: PASS
+recovery metadata 1: PASS
+recovery flexible fields 1: PASS
+recovery download SHA256 1: PASS
+recovery metadata 2: PASS
+recovery flexible fields 2: PASS
+recovery download SHA256 2: PASS
+PostgreSQL ready row: PASS
+MongoDB metadata row: PASS
+MinIO object size: PASS
+DAY 2 RECOVERY: PASS

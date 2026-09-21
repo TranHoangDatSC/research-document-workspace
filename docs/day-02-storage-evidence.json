@@ -1,0 +1,7 @@
+{
+  "postgresql_status": "ready",
+  "mongodb_document_id": "6d24286a-b50c-486b-bc01-e370ceff0674",
+  "bucket": "research-documents-workspace",
+  "object_name": "documents/6d24286a-b50c-486b-bc01-e370ceff0674/original.txt",
+  "minio_size": 175
+}
