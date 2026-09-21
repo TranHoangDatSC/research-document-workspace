@@ -1,0 +1,28 @@
+@'
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local runtime data and logs
+data/
+logs/
+*.log
+'@ | Set-Content -Encoding utf8 .gitignore
