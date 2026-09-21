@@ -49,3 +49,7 @@ def health_ready():
             "services": services,
         },
     )
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
