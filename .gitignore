@@ -1,4 +1,3 @@
-@'
 # Secrets and local environment
 .env
 .env.*
@@ -25,4 +24,8 @@ Thumbs.db
 data/
 logs/
 *.log
-'@ | Set-Content -Encoding utf8 .gitignore
+
+# Generated test output
+/artifacts/
+# Local installer archives
+/research-workspace-*.zip

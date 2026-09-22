@@ -13,9 +13,9 @@ import urllib.error
 import urllib.request
 from uuid import uuid4
 
-ROOT = Path(__file__).resolve().parents[1]
-DOCS = ROOT / 'docs'
-STATE = DOCS / 'day-02-state.json'
+ROOT = Path(__file__).resolve().parents[2]
+OUTPUT = ROOT / 'artifacts' / 'day-02'
+STATE = OUTPUT / 'day-02-state.json'
 BASE = 'http://127.0.0.1:8000'
 results = []
 
@@ -80,7 +80,7 @@ print(json.dumps({"postgresql_status": row[0], "mongodb_document_id": metadata["
     require(evidence['postgresql_status'] == 'ready', 'PostgreSQL ready row')
     require(evidence['mongodb_document_id'] == document['id'], 'MongoDB metadata row')
     require(evidence['minio_size'] == document['size_bytes'], 'MinIO object size')
-    (DOCS / 'day-02-storage-evidence.json').write_text(json.dumps(evidence, indent=2), encoding='utf-8')
+    (OUTPUT / 'day-02-storage-evidence.json').write_text(json.dumps(evidence, indent=2), encoding='utf-8')
     print(json.dumps(evidence, indent=2))
 
 
@@ -93,7 +93,7 @@ def verify_saved(state, label):
         require(current['tags'] == ['cloud', 'database'] and current['custom_metadata']['course'] == 'Cloud', label + f' flexible fields {index + 1}')
         status, payload = request('/documents/' + saved['id'] + '/download')
         require(status == 200 and hashlib.sha256(payload).hexdigest() == saved['sha256'], label + f' download SHA256 {index + 1}')
-        (DOCS / f'day-02-{label}-download-{index + 1}.txt').write_bytes(payload)
+        (OUTPUT / f'day-02-{label}-download-{index + 1}.txt').write_bytes(payload)
     storage_evidence(state['documents'][0])
 
 
@@ -180,8 +180,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('phase', choices=['before', 'after', 'failure', 'recovery'])
     args = parser.parse_args()
-    DOCS.mkdir(exist_ok=True)
-    report = DOCS / f'day-02-{args.phase}-result.txt'
+    OUTPUT.mkdir(parents=True, exist_ok=True)
+    report = OUTPUT / f'day-02-{args.phase}-result.txt'
     try:
         if args.phase == 'before':
             before()

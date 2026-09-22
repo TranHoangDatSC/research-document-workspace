@@ -9,3 +9,9 @@ __pycache__
 data
 logs
 *.log
+
+artifacts/
+tests/
+docs/
+samples/
+*.zip

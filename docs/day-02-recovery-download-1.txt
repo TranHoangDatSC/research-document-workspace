@@ -1,3 +1,0 @@
-Research Document Workspace - Day 2
-This file proves upload, download and persistent storage.
-Project metadata: PostgreSQL. Flexible metadata: MongoDB. Original bytes: MinIO.

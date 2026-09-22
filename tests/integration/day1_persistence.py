@@ -6,7 +6,7 @@ from app.storage import postgres_connection, mongo_client, minio_client
 
 mode = sys.argv[1]
 if mode not in {"seed", "verify"}:
-    raise SystemExit("Usage: python -m app.persistence_check seed|verify")
+    raise SystemExit("Usage: pipe day1_persistence.py to container python - seed|verify")
 
 marker = "checkpoint-c-persistence-v1"
 bucket = "checkpoint-c"

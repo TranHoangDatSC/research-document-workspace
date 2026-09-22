@@ -3,15 +3,19 @@ name: research-document-workspace
 services:
   web:
     build: .
-    image: research-document-workspace:day1
+    image: research-document-workspace:dev
     env_file:
       - .env
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
-      - postgres
-      - mongo
-      - minio
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    restart: unless-stopped
     healthcheck:
       test:
         - CMD
@@ -31,6 +35,12 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Missing POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   mongo:
     image: mongo:7.0
@@ -40,6 +50,12 @@ services:
     volumes:
       - mongo_data:/data/db
       - mongo_config:/data/configdb
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
 
   minio:
     image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
@@ -52,6 +68,12 @@ services:
       - "127.0.0.1:9001:9001"
     volumes:
       - minio_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
 volumes:
   postgres_data:

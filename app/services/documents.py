@@ -1,23 +1,21 @@
-"""Day 2 document APIs. All routes belong to the existing FastAPI monolith."""
+"""Upload/download orchestration; HTTP errors retained to preserve API behavior."""
+
 import hashlib
 import io
 import json
 import logging
-import os
 from pathlib import PurePosixPath
-from typing import Annotated
 from urllib.parse import quote
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import psycopg
-from fastapi import APIRouter, File, Form, HTTPException, Query, UploadFile
+from fastapi import HTTPException
 from fastapi.responses import Response
-from psycopg.rows import dict_row
 
 from app.bootstrap import bucket_name
-from app.storage import postgres_connection, mongo_client, minio_client
+from app.repositories import documents as repository
+from app.storage import minio_client
 
-router = APIRouter(tags=["documents"])
 log = logging.getLogger("uvicorn.error")
 MAX_BYTES = 10 * 1024 * 1024
 MIME_TYPES = {
@@ -25,24 +23,18 @@ MIME_TYPES = {
     ".pdf": "application/pdf",
     ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 }
-FIELDS = "id, project_id, original_name, object_name, content_type, size_bytes, status, created_at"
 
 
 def storage_error(stage, exc, document_id=None):
-    log.warning("document stage=%s id=%s error=%s", stage, document_id, type(exc).__name__)
+    log.warning(
+        "document stage=%s id=%s error=%s", stage, document_id, type(exc).__name__
+    )
     return HTTPException(503, "Document storage unavailable; check server logs")
-
-
-def sql_one(statement, params):
-    with postgres_connection() as connection:
-        with connection.cursor(row_factory=dict_row) as cursor:
-            cursor.execute(statement, params)
-            return cursor.fetchone()
 
 
 def require_project(project_id):
     try:
-        row = sql_one("SELECT id FROM projects WHERE id = %s", (project_id,))
+        row = repository.project_exists(project_id)
     except psycopg.Error as exc:
         raise storage_error("read-project", exc) from None
     if row is None:
@@ -51,7 +43,7 @@ def require_project(project_id):
 
 def document_row(document_id):
     try:
-        row = sql_one(f"SELECT {FIELDS} FROM documents WHERE id = %s", (document_id,))
+        row = repository.get_document(document_id)
     except psycopg.Error as exc:
         raise storage_error("read-document", exc, document_id) from None
     if row is None:
@@ -65,7 +57,9 @@ def require_ready(row):
 
 
 def split_values(value):
-    result = list(dict.fromkeys(part.strip() for part in value.split(",") if part.strip()))
+    result = list(
+        dict.fromkeys(part.strip() for part in value.split(",") if part.strip())
+    )
     if len(result) > 50 or any(len(part) > 200 for part in result):
         raise HTTPException(422, "At most 50 items, each at most 200 characters")
     return result
@@ -76,35 +70,33 @@ def compensate(document_id, object_name, object_attempted, mongo_attempted):
     # committed ready document if the result of that commit is unknown.
     if mongo_attempted:
         try:
-            with mongo_client() as client:
-                client[os.environ["MONGO_DB"]]["document_details"].delete_one(
-                    {"document_id": str(document_id)}
-                )
+            repository.delete_details(document_id)
         except Exception as exc:
-            log.error("cleanup MongoDB incomplete id=%s error=%s", document_id, type(exc).__name__)
+            log.error(
+                "cleanup MongoDB incomplete id=%s error=%s",
+                document_id,
+                type(exc).__name__,
+            )
     if object_attempted:
         try:
             minio_client().remove_object(bucket_name(), object_name)
         except Exception as exc:
-            log.error("cleanup MinIO incomplete id=%s error=%s", document_id, type(exc).__name__)
-    try:
-        with postgres_connection() as connection:
-            connection.execute(
-                "UPDATE documents SET status = 'failed' WHERE id = %s AND status = 'pending'",
-                (document_id,),
+            log.error(
+                "cleanup MinIO incomplete id=%s error=%s",
+                document_id,
+                type(exc).__name__,
             )
+    try:
+        repository.mark_failed(document_id)
     except Exception as exc:
-        log.error("cleanup PostgreSQL incomplete id=%s error=%s", document_id, type(exc).__name__)
+        log.error(
+            "cleanup PostgreSQL incomplete id=%s error=%s",
+            document_id,
+            type(exc).__name__,
+        )
 
 
-@router.post("/projects/{project_id}/documents", status_code=201)
-def upload_document(
-    project_id: UUID,
-    file: Annotated[UploadFile, File()],
-    tags: Annotated[str, Form(max_length=5000)] = "",
-    authors: Annotated[str, Form(max_length=5000)] = "",
-    custom_metadata: Annotated[str, Form(max_length=16000)] = "{}",
-):
+def upload_document(project_id, file, tags="", authors="", custom_metadata="{}"):
     require_project(project_id)
     filename = PurePosixPath((file.filename or "").replace("\\", "/")).name
     suffix = PurePosixPath(filename).suffix.lower()
@@ -139,25 +131,26 @@ def upload_document(
     object_attempted = mongo_attempted = finalizing = False
     try:
         # Durable pending record makes interrupted uploads discoverable.
-        sql_one(
-            "INSERT INTO documents "
-            "(id, project_id, original_name, object_name, content_type, size_bytes, status) "
-            "VALUES (%s, %s, %s, %s, %s, %s, 'pending') RETURNING id",
-            (document_id, project_id, filename, object_name, MIME_TYPES[suffix], len(payload)),
+        repository.create_pending(
+            document_id,
+            project_id,
+            filename,
+            object_name,
+            MIME_TYPES[suffix],
+            len(payload),
         )
         object_attempted = True
         minio_client().put_object(
-            bucket_name(), object_name, io.BytesIO(payload), len(payload),
+            bucket_name(),
+            object_name,
+            io.BytesIO(payload),
+            len(payload),
             content_type=MIME_TYPES[suffix],
         )
         mongo_attempted = True
-        with mongo_client() as client:
-            client[os.environ["MONGO_DB"]]["document_details"].insert_one(details.copy())
+        repository.insert_details(details)
         finalizing = True
-        row = sql_one(
-            f"UPDATE documents SET status = 'ready' WHERE id = %s RETURNING {FIELDS}",
-            (document_id,),
-        )
+        row = repository.mark_ready(document_id)
     except Exception as exc:
         if finalizing:
             # SQL COMMIT could have succeeded even if its acknowledgement was lost.
@@ -169,35 +162,19 @@ def upload_document(
     return {**row, **details}
 
 
-@router.get("/projects/{project_id}/documents")
-def list_documents(
-    project_id: UUID,
-    limit: int = Query(default=20, ge=1, le=100),
-    offset: int = Query(default=0, ge=0),
-):
+def list_documents(project_id, limit=20, offset=0):
     require_project(project_id)
     try:
-        with postgres_connection() as connection:
-            with connection.cursor(row_factory=dict_row) as cursor:
-                cursor.execute(
-                    f"SELECT {FIELDS} FROM documents WHERE project_id = %s "
-                    "ORDER BY created_at DESC, id DESC LIMIT %s OFFSET %s",
-                    (project_id, limit, offset),
-                )
-                return cursor.fetchall()
+        return repository.list_documents(project_id, limit, offset)
     except psycopg.Error as exc:
         raise storage_error("list-documents", exc) from None
 
 
-@router.get("/documents/{document_id}")
-def get_document(document_id: UUID):
+def get_document(document_id):
     row = document_row(document_id)
     require_ready(row)
     try:
-        with mongo_client() as client:
-            details = client[os.environ["MONGO_DB"]]["document_details"].find_one(
-                {"document_id": str(document_id)}, {"_id": 0}
-            )
+        details = repository.get_details(document_id)
         if details is None:
             raise RuntimeError("Missing document metadata")
     except Exception as exc:
@@ -205,8 +182,7 @@ def get_document(document_id: UUID):
     return {**row, **details}
 
 
-@router.get("/documents/{document_id}/download")
-def download_document(document_id: UUID):
+def download_document(document_id):
     row = document_row(document_id)
     require_ready(row)
     try:
@@ -225,7 +201,8 @@ def download_document(document_id: UUID):
         content=payload,
         media_type=row["content_type"],
         headers={
-            "Content-Disposition": "attachment; filename*=UTF-8''" + quote(row["original_name"], safe=""),
+            "Content-Disposition": "attachment; filename*=UTF-8''"
+            + quote(row["original_name"], safe=""),
             "X-Content-Type-Options": "nosniff",
         },
     )
