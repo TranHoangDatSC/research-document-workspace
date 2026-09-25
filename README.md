@@ -4,7 +4,7 @@
 
 | Thành phần | Vai trò |
 | --- | --- |
-| `web` (FastAPI) | API, cổng `127.0.0.1:8000` |
+| `web` (FastAPI) | API, cổng `127.0.0.1:8001` |
 | PostgreSQL | Project + thông tin cố định của tài liệu |
 | MongoDB | Metadata linh hoạt (tags, authors, custom metadata, SHA-256) |
 | MinIO | File gốc, console `127.0.0.1:9001` |
@@ -44,7 +44,7 @@ mở API, nên không cần bước khởi tạo thủ công. Lệnh `up` trả 
 docker compose up -d --wait --wait-timeout 180
 ```
 
-3. Mở http://127.0.0.1:8000/docs (Swagger).
+3. Mở http://127.0.0.1:8001/docs (Swagger).
 
 Sửa code trong `app/` → thêm `--build` vào lệnh trên. Sửa `.env` → chạy lại `up -d`
 (`restart` không đọc lại `.env`).
@@ -55,7 +55,7 @@ Sửa code trong `app/` → thêm `--build` vào lệnh trên. Sửa `.env` → 
 | --- | --- |
 | Xem trạng thái | `docker compose ps` |
 | Xem log web | `docker compose logs --tail 100 web` |
-| Kiểm tra sẵn sàng | `curl.exe http://127.0.0.1:8000/health/ready` |
+| Kiểm tra sẵn sàng | `curl.exe http://127.0.0.1:8001/health/ready` |
 | Tạm dừng (giữ container) | `docker compose stop` |
 | Tắt hẳn (giữ dữ liệu) | `docker compose down` |
 | **Xoá toàn bộ dữ liệu** | `docker compose down -v` — không dùng nếu muốn giữ dữ liệu |
@@ -68,7 +68,7 @@ Endpoint: `/docs` (Swagger), `/health/live`, `/health/ready`. Chi tiết API: [d
 | --- | --- |
 | `web` **unhealthy**, `/health/ready` báo 1 service `down` | `docker compose logs web` xem service nào lỗi, rồi `docker compose up -d --force-recreate <service>` |
 | Log web `NameResolutionError`, `docker compose ps` thấy MinIO/DB **không có port** | Container bị rời network (hay gặp sau khi Docker Desktop khởi động lại): `docker compose up -d --force-recreate --wait` |
-| Port 8000/9000/9001 bị chiếm | Tắt container/app khác dùng port đó (`docker ps`), không chạy MinIO riêng bằng `docker run` |
+| Port 8001/9000/9001 bị chiếm | Tắt container/app khác dùng port đó (`docker ps`), không chạy MinIO riêng bằng `docker run` |
 | Web thoát ngay, log `initialization failed` | Sai mật khẩu so với volume cũ → khôi phục đúng giá trị `.env` cũ |
 | `Missing POSTGRES_DB` khi chạy compose | Chưa có `.env` hoặc thiếu biến → so với `.env.example` |
 

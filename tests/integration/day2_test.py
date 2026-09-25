@@ -16,7 +16,7 @@ from uuid import uuid4
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / 'artifacts' / 'day-02'
 STATE = OUTPUT / 'day-02-state.json'
-BASE = 'http://127.0.0.1:8000'
+BASE = 'http://127.0.0.1:8001'
 results = []
 
 

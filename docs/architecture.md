@@ -10,7 +10,7 @@ Client ──HTTP──> web (FastAPI :8000)
                   └── MinIO       bucket MINIO_BUCKET: documents/<id>/original.<ext>
 ```
 
-Chỉ `web` (8000) và MinIO (9000, console 9001) mở ra `127.0.0.1`.
+Chỉ `web` (host 8001 → container 8000) và MinIO (9000, console 9001) mở ra `127.0.0.1`.
 PostgreSQL và MongoDB chỉ truy cập được trong network Compose.
 
 ## Các lớp trong `app/`

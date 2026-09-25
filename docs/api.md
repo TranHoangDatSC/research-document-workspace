@@ -1,6 +1,6 @@
 # API
 
-Swagger đầy đủ: http://127.0.0.1:8000/docs
+Swagger đầy đủ: http://127.0.0.1:8001/docs
 
 ## Endpoint
 
@@ -23,7 +23,7 @@ Ví dụ:
 
 ```powershell
 curl.exe -F "file=@samples/day2-sample.txt" -F "tags=cloud,database" `
-  http://127.0.0.1:8000/projects/<project_id>/documents
+  http://127.0.0.1:8001/projects/<project_id>/documents
 ```
 
 ## Quy tắc kiểm tra

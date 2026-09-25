@@ -1,0 +1,28 @@
+GET /health/ready: PASS
+Readiness: PASS
+Home HTML: PASS
+Static CSS: PASS
+Empty project rejected: PASS
+Invalid UUID HTML: PASS
+Unknown document HTML: PASS
+Create project UI: PASS
+Project HTML: PASS
+Upload UI redirect: PASS
+GET /documents/2a11131f-c783-48d4-9301-5a96635de254: PASS
+Upload UI redirect: PASS
+GET /documents/c80cb147-2306-4cdf-8de6-d393ba3bdf13: PASS
+Deletion confirmation page: PASS
+Deletion requires confirmation: PASS
+Delete UI: PASS
+404 after delete: PASS
+Repeated DELETE is idempotent: PASS
+Absent from all 3 stores: c80cb147-2306-4cdf-8de6-d393ba3bdf13: PASS
+Upload UI redirect: PASS
+GET /documents/46e0d759-c579-48b0-8c87-1388af46cb56: PASS
+Document HTML: PASS
+GET /documents/2a11131f-c783-48d4-9301-5a96635de254: PASS
+Aggregated metadata: PASS
+Download SHA256: PASS
+Download filename: PASS
+Present in all 3 stores: 2a11131f-c783-48d4-9301-5a96635de254: PASS
+DAY 3 BEFORE: PASS

@@ -1,7 +1,7 @@
 # Kiểm thử
 
 Chạy ở thư mục gốc, stack đang `healthy`. Test ngày 2 chạy trên Windows bằng
-Python ≥ 3.11 (chỉ thư viện chuẩn), gọi `127.0.0.1:8000` và `docker compose exec`.
+Python ≥ 3.11 (chỉ thư viện chuẩn), gọi `127.0.0.1:8001` và `docker compose exec`.
 
 Mỗi phase ghi kết quả vào `artifacts/day-02/day-02-<phase>-result.txt`, trả exit code
 khác 0 khi FAIL. `artifacts/day-02/day-02-state.json` lưu ID project/tài liệu và SHA-256

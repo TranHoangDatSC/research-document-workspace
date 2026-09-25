@@ -1,0 +1,12 @@
+Readiness after recreation: PASS
+after project: PASS
+after metadata 1: PASS
+after flexible fields 1: PASS
+after download SHA256 1: PASS
+after metadata 2: PASS
+after flexible fields 2: PASS
+after download SHA256 2: PASS
+PostgreSQL ready row: PASS
+MongoDB metadata row: PASS
+MinIO object size: PASS
+DAY 2 AFTER: PASS
