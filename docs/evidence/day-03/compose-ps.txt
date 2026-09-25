@@ -1,5 +1,5 @@
 ﻿NAME                                     IMAGE                                              COMMAND                  SERVICE    CREATED          STATUS                    PORTS
-research-document-workspace-minio-1      quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z   "/usr/bin/docker-entΓÇª"   minio      20 seconds ago   Up 19 seconds (healthy)   127.0.0.1:9000-9001->9000-9001/tcp
-research-document-workspace-mongo-1      mongo:7.0                                          "docker-entrypoint.sΓÇª"   mongo      20 seconds ago   Up 19 seconds (healthy)   27017/tcp
-research-document-workspace-postgres-1   postgres:16-bookworm                               "docker-entrypoint.sΓÇª"   postgres   20 seconds ago   Up 19 seconds (healthy)   5432/tcp
-research-document-workspace-web-1        research-document-workspace:dev                    "sh -c 'python -m apΓÇª"   web        20 seconds ago   Up 13 seconds (healthy)   127.0.0.1:8001->8000/tcp
+research-document-workspace-minio-1      quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z   "/usr/bin/docker-entΓÇª"   minio      19 seconds ago   Up 18 seconds (healthy)   127.0.0.1:9000-9001->9000-9001/tcp
+research-document-workspace-mongo-1      mongo:7.0                                          "docker-entrypoint.sΓÇª"   mongo      19 seconds ago   Up 18 seconds (healthy)   27017/tcp
+research-document-workspace-postgres-1   postgres:16-bookworm                               "docker-entrypoint.sΓÇª"   postgres   19 seconds ago   Up 18 seconds (healthy)   5432/tcp
+research-document-workspace-web-1        research-document-workspace:dev                    "sh -c 'python -m apΓÇª"   web        19 seconds ago   Up 13 seconds (healthy)   127.0.0.1:8001->8000/tcp

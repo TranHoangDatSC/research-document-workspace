@@ -1,1 +1,13 @@
-{% extends "base.html" %}{% block content %}<section class="panel narrow" role="alert"><p class="eyebrow">YÊU CẦU CHƯA HOÀN TẤT</p><h1>Lỗi {{ status }}</h1><p>{{ message }}</p><p>Nếu dịch vụ tạm gián đoạn, chờ hệ thống phục hồi rồi thử lại. File cần được chọn lại khi gửi biểu mẫu mới.</p><a href="/">Quay về danh sách dự án</a></section>{% endblock %}
+{% extends "base.html" %}
+{% block title %}Lỗi {{ status }} · Research Document Workspace{% endblock %}
+{% block crumbs %}<span class="crumb-current">Lỗi {{ status }}</span>{% endblock %}
+{% block content %}
+<section class="card narrow center-card" role="alert">
+  <span class="warn-icon">{{ icon('warning', 26) }}</span>
+  <p class="eyebrow">Yêu cầu chưa hoàn tất</p>
+  <h1>Lỗi {{ status }}</h1>
+  <p>{{ message }}</p>
+  <p class="muted">Nếu dịch vụ tạm gián đoạn, chờ hệ thống phục hồi rồi thử lại. File cần được chọn lại khi gửi biểu mẫu mới.</p>
+  <p><a class="btn primary" href="/">Quay về danh sách dự án</a></p>
+</section>
+{% endblock %}

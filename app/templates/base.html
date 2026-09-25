@@ -1,3 +1,66 @@
 <!doctype html>
-<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{% block title %}Research Document Workspace{% endblock %}</title><link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}"></head>
-<body><header><a class="brand" href="/">RDW <span>Research Document Workspace</span></a><nav><a href="/">Dự án</a><a href="/docs">API Docs</a></nav></header><main>{% block content %}{% endblock %}</main><footer>Research Document Workspace · Đồ án Điện toán đám mây</footer></body></html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}Research Document Workspace{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+  <script src="{{ url_for('static', path='/app.js') }}" defer></script>
+</head>
+<body>
+<div class="shell" id="shell">
+
+  <aside class="sidebar" id="sidebar" aria-label="Điều hướng dự án">
+    <a class="brand" href="/">
+      <span class="brand-mark">{{ icon('layers', 18) }}</span>
+      <span class="brand-text"><strong>RDW</strong><small>Research Document Workspace</small></span>
+    </a>
+
+    <section class="side-section" aria-label="Trạng thái hệ thống">
+      <h2 class="side-title">Hệ thống</h2>
+      <ul class="stores" id="store-status" data-endpoint="/health/ready">
+        <li data-store="postgresql"><span class="dot"></span>{{ icon('database', 14) }}<span>PostgreSQL</span></li>
+        <li data-store="mongodb"><span class="dot"></span>{{ icon('braces', 14) }}<span>MongoDB</span></li>
+        <li data-store="minio"><span class="dot"></span>{{ icon('drive', 14) }}<span>MinIO</span></li>
+      </ul>
+    </section>
+
+    <section class="side-section grow" aria-label="Dự án">
+      <div class="side-head">
+        <h2 class="side-title">Dự án</h2>
+        <a class="icon-btn" href="/#new-project" title="Tạo dự án mới" aria-label="Tạo dự án mới">{{ icon('plus', 15) }}</a>
+      </div>
+      {% if sidebar_projects|length > 6 %}
+      <label class="search"><span class="sr-only">Lọc dự án</span>{{ icon('search', 14) }}<input type="search" id="project-filter" placeholder="Lọc dự án…" autocomplete="off"></label>
+      {% endif %}
+      <nav class="tree" id="project-tree">
+        {% for p in sidebar_projects %}
+        <a class="tree-item{% if active_project_id and p.id|string == active_project_id|string %} active{% endif %}" href="/ui/projects/{{ p.id }}" title="{{ p.name }}">{{ icon('folder', 15) }}<span>{{ p.name }}</span></a>
+        {% else %}
+        <p class="side-empty">Chưa có dự án.</p>
+        {% endfor %}
+      </nav>
+    </section>
+
+    <div class="side-foot">
+      <a href="/docs" class="side-link">{{ icon('book', 14) }}<span>API Docs</span></a>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim" hidden></div>
+
+  <div class="workspace">
+    <header class="topbar">
+      <button type="button" class="icon-btn" id="toggle-sidebar" aria-controls="sidebar" aria-expanded="true" title="Ẩn/hiện thanh bên">{{ icon('panel-left', 18) }}</button>
+      <nav class="crumbs" aria-label="Vị trí hiện tại">{% block crumbs %}<span class="crumb-current">Dự án</span>{% endblock %}</nav>
+      <div class="topbar-actions">{% block topbar_actions %}{% endblock %}</div>
+    </header>
+
+    <div class="body">
+      <main class="canvas" id="main">{% block content %}{% endblock %}</main>
+      {% block inspector %}{% endblock %}
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

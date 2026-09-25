@@ -1,11 +1,11 @@
 GET /health/ready: PASS
 Recovery readiness: PASS
 Retry deletion after recovery: PASS
-Absent from all 3 stores: 46e0d759-c579-48b0-8c87-1388af46cb56: PASS
+Absent from all 3 stores: f7d1accc-ed29-4752-9c09-16af4340ac38: PASS
 Document HTML: PASS
-GET /documents/2a11131f-c783-48d4-9301-5a96635de254: PASS
+GET /documents/4b4a38c9-e10d-4743-a36f-d26837379a83: PASS
 Aggregated metadata: PASS
 Download SHA256: PASS
 Download filename: PASS
-Present in all 3 stores: 2a11131f-c783-48d4-9301-5a96635de254: PASS
+Present in all 3 stores: 4b4a38c9-e10d-4743-a36f-d26837379a83: PASS
 DAY 3 RECOVERY: PASS

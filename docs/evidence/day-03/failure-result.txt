@@ -1,7 +1,7 @@
 Live during Mongo outage: PASS
 Not ready during Mongo outage: PASS
 Partial deletion reports failure: PASS
-GET /projects/31d662e3-1248-486b-a58a-0ca6eb81310d/documents?limit=100: PASS
+GET /projects/7ac306ab-d238-42a0-88fc-7a4a3fd99ef1/documents?limit=100: PASS
 Durable deleting status: PASS
 Partial deletion blocks download: PASS
 Storage error HTML: PASS

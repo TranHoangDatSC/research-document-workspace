@@ -1,6 +1,64 @@
-{% extends "base.html" %}{% block content %}
-<p class="eyebrow">THƯ VIỆN NGHIÊN CỨU</p><h1>Tài liệu của bạn,<br>trong cùng một không gian.</h1><p class="muted">Tạo dự án, lưu tài liệu và theo dõi thông tin nghiên cứu.</p>
-<div class="statusbar" aria-label="Trạng thái hệ thống">{% for name, state in health.services.items() %}<span class="badge {{ state }}">{{ name }}: {{ state }}</span>{% endfor %}</div>
-<div class="grid"><section class="panel"><h2>Dự án</h2>{% for project in projects %}<a class="project" href="/ui/projects/{{ project.id }}"><strong>{{ project.name }}</strong><p>{{ project.description or 'Chưa có mô tả' }}</p><small>{{ project.created_at }}</small></a>{% else %}<p>Chưa có dự án. Tạo dự án đầu tiên bằng biểu mẫu bên cạnh.</p>{% endfor %}<div class="pager">{% if offset > 0 %}<a href="/?offset={{ [0, offset-20]|max }}">← Trang trước</a>{% endif %}{% if projects|length == 20 %}<a href="/?offset={{ offset+20 }}">Trang sau →</a>{% endif %}</div></section>
-<section class="panel"><h2>Tạo dự án</h2><form method="post" action="/ui/projects"><label>Tên dự án<input name="name" required maxlength="200" placeholder="Ví dụ: Cloud Research"></label><label>Mô tả<textarea name="description" maxlength="5000" rows="5"></textarea></label><button>Tạo dự án</button></form></section></div>
+{% extends "base.html" %}
+{% block crumbs %}<span class="crumb-current">Tổng quan</span>{% endblock %}
+{% block content %}
+<div class="page-head">
+  <p class="eyebrow">Thư viện nghiên cứu</p>
+  <h1>Tài liệu của bạn, trong cùng một không gian.</h1>
+  <p class="muted lead">Tạo dự án, lưu tài liệu và theo dõi thông tin nghiên cứu.</p>
+</div>
+
+<section aria-label="Trạng thái hệ thống" class="stat-row">
+  {% set meta = {'postgresql': ('database', 'PostgreSQL', 'Dự án &amp; bản ghi tài liệu'), 'mongodb': ('braces', 'MongoDB', 'Metadata nghiên cứu'), 'minio': ('drive', 'MinIO', 'File gốc (S3)')} %}
+  {% for name, state in health.services.items() %}
+  <div class="stat-card">
+    <span class="stat-icon">{{ icon(meta[name][0], 18) }}</span>
+    <div>
+      <strong>{{ meta[name][1] }}</strong>
+      <small>{{ meta[name][2]|safe }}</small>
+    </div>
+    <span class="badge {{ state }}">{{ name }}: {{ state }}</span>
+  </div>
+  {% endfor %}
+</section>
+
+<div class="split">
+  <section class="card">
+    <div class="card-head"><h2>Dự án</h2><span class="muted small-text">{{ projects|length }} mục{% if offset %} · từ #{{ offset + 1 }}{% endif %}</span></div>
+    {% if projects %}
+    <div class="project-grid">
+      {% for project in projects %}
+      <a class="project-card" href="/ui/projects/{{ project.id }}">
+        <span class="project-icon">{{ icon('folder', 18) }}</span>
+        <strong>{{ project.name }}</strong>
+        <p>{{ project.description or 'Chưa có mô tả' }}</p>
+        <small>{{ icon('clock', 12) }} {{ project.created_at|dt }}</small>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+      <span class="empty-icon">{{ icon('folder', 28) }}</span>
+      <p><strong>Chưa có dự án</strong></p>
+      <p class="muted">Tạo dự án đầu tiên bằng biểu mẫu bên cạnh.</p>
+    </div>
+    {% endif %}
+    <div class="pager">
+      {% if offset > 0 %}<a href="/?offset={{ [0, offset-20]|max }}">← Trang trước</a>{% endif %}
+      {% if projects|length == 20 %}<a href="/?offset={{ offset+20 }}">Trang sau →</a>{% endif %}
+    </div>
+  </section>
+
+  <section class="card" id="new-project">
+    <div class="card-head"><h2>Tạo dự án</h2></div>
+    <form method="post" action="/ui/projects" class="stack">
+      <label class="field">Tên dự án
+        <input name="name" required maxlength="200" placeholder="Ví dụ: Cloud Research">
+      </label>
+      <label class="field">Mô tả
+        <textarea name="description" maxlength="5000" rows="5" placeholder="Mục tiêu, phạm vi, nhóm thực hiện…"></textarea>
+      </label>
+      <button class="btn primary">{{ icon('plus', 16) }}Tạo dự án</button>
+    </form>
+  </section>
+</div>
 {% endblock %}

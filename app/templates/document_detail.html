@@ -1,1 +1,84 @@
-{% extends "base.html" %}{% block content %}<a href="/ui/projects/{{ document.project_id }}">← {{ project.name }}</a><h1>{{ document.original_name }}</h1><p><span class="badge ready">{{ document.status }}</span></p><div class="actions"><a class="button" href="/documents/{{ document.id }}/download">Tải file gốc</a><a class="button secondary" href="/ui/documents/{{ document.id }}/delete">Xóa tài liệu</a></div><div class="grid"><section class="panel"><h2>Thông tin tài liệu</h2><dl><dt>ID</dt><dd>{{ document.id }}</dd><dt>Loại file</dt><dd>{{ document.content_type }}</dd><dt>Kích thước</dt><dd>{{ document.size_bytes }} bytes</dd><dt>Ngày tạo</dt><dd>{{ document.created_at }}</dd><dt>SHA-256</dt><dd class="hash">{{ document.sha256 }}</dd></dl></section><section class="panel"><h2>Metadata nghiên cứu</h2><dl><dt>Tác giả</dt><dd>{{ document.authors|join(', ') or 'Chưa có' }}</dd><dt>Tags</dt><dd>{{ document.tags|join(', ') or 'Chưa có' }}</dd><dt>Thông tin bổ sung</dt><dd><pre>{{ document.custom_metadata|tojson(indent=2) }}</pre></dd><dt>Nguồn</dt><dd><pre>{{ document.source|tojson(indent=2) }}</pre></dd></dl></section></div>{% endblock %}
+{% extends "base.html" %}
+{% block title %}{{ document.original_name }} · Research Document Workspace{% endblock %}
+{% block crumbs %}<a href="/">Dự án</a>{{ icon('chevron-right', 14) }}<a href="/ui/projects/{{ project.id }}">{{ project.name }}</a>{{ icon('chevron-right', 14) }}<span class="crumb-current">{{ document.original_name }}</span>{% endblock %}
+{% block topbar_actions %}<button type="button" class="icon-btn" id="toggle-inspector" aria-controls="inspector" aria-expanded="true" title="Ẩn/hiện bảng lưu trữ">{{ icon('panel-right', 18) }}</button>{% endblock %}
+
+{% block content %}
+<div class="page-head doc-head">
+  <div class="doc-title">
+    <span class="file-icon lg">{{ icon('file', 24) }}</span>
+    <div>
+      <p class="eyebrow">Tài liệu</p>
+      <h1>{{ document.original_name }}</h1>
+      <p><span class="badge {{ document.status }}">{{ document.status }}</span> <span class="muted small-text">{{ document.size_bytes|filesize }} · {{ document.content_type }}</span></p>
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn primary" href="/documents/{{ document.id }}/download">{{ icon('download', 16) }}Tải file gốc</a>
+    <a class="btn secondary" href="/ui/documents/{{ document.id }}/delete">{{ icon('trash', 16) }}Xóa tài liệu</a>
+  </div>
+</div>
+
+<div class="tabs" role="tablist" aria-label="Chế độ xem" id="doc-tabs" hidden>
+  <button type="button" role="tab" id="tab-info" aria-controls="pane-info" aria-selected="true">{{ icon('info', 15) }}Thông tin</button>
+  <button type="button" role="tab" id="tab-json" aria-controls="pane-json" aria-selected="false" tabindex="-1">{{ icon('braces', 15) }}JSON (MongoDB)</button>
+</div>
+
+<div id="pane-info" role="tabpanel" aria-labelledby="tab-info" class="pane">
+  <div class="split even">
+    <section class="card">
+      <div class="card-head"><h2>Thông tin tài liệu</h2></div>
+      <dl class="props">
+        <div><dt>{{ icon('hash', 14) }}ID</dt><dd class="mono">{{ document.id }}</dd></div>
+        <div><dt>{{ icon('file', 14) }}Loại file</dt><dd>{{ document.content_type }}</dd></div>
+        <div><dt>{{ icon('drive', 14) }}Kích thước</dt><dd>{{ document.size_bytes|filesize }} <span class="muted">({{ document.size_bytes }} bytes)</span></dd></div>
+        <div><dt>{{ icon('clock', 14) }}Ngày tạo</dt><dd>{{ document.created_at|dt }}</dd></div>
+        <div><dt>{{ icon('hash', 14) }}SHA-256</dt><dd class="mono hash">{{ document.sha256 }}</dd></div>
+      </dl>
+    </section>
+    <section class="card">
+      <div class="card-head"><h2>Metadata nghiên cứu</h2></div>
+      <dl class="props">
+        <div><dt>{{ icon('user', 14) }}Tác giả</dt><dd>{% for a in document.authors %}<span class="chip">{{ a }}</span>{% else %}<span class="muted">Chưa có</span>{% endfor %}</dd></div>
+        <div><dt>{{ icon('tag', 14) }}Tags</dt><dd>{% for t in document.tags %}<span class="chip">{{ t }}</span>{% else %}<span class="muted">Chưa có</span>{% endfor %}</dd></div>
+        <div><dt>{{ icon('braces', 14) }}Thông tin bổ sung</dt><dd><pre>{{ document.custom_metadata|pretty_json }}</pre></dd></div>
+        <div><dt>{{ icon('book', 14) }}Nguồn</dt><dd><pre>{{ document.source|pretty_json }}</pre></dd></div>
+      </dl>
+    </section>
+  </div>
+</div>
+
+<div id="pane-json" role="tabpanel" aria-labelledby="tab-json" class="pane">
+  <section class="card">
+    <div class="card-head">
+      <h2>Document MongoDB <span class="muted small-text mono">document_details</span></h2>
+      <button type="button" class="btn ghost sm" id="copy-json" data-target="json-source">{{ icon('copy', 14) }}<span>Sao chép</span></button>
+    </div>
+    <pre class="json" id="json-source">{{ mongo_document|pretty_json }}</pre>
+  </section>
+</div>
+{% endblock %}
+
+{% block inspector %}
+<aside class="inspector" id="inspector" aria-label="Nơi lưu trữ dữ liệu">
+  <h2 class="side-title">Lưu trữ dữ liệu</h2>
+  <p class="muted small-text">Mỗi tài liệu được chia ra ba kho. Không có giao dịch chung giữa chúng.</p>
+  <ul class="store-list">
+    <li>
+      <span class="stat-icon">{{ icon('database', 16) }}</span>
+      <div><strong>PostgreSQL</strong><small>bảng <code>documents</code></small>
+        <dl class="mini"><dt>project_id</dt><dd class="mono">{{ document.project_id }}</dd><dt>status</dt><dd>{{ document.status }}</dd></dl></div>
+    </li>
+    <li>
+      <span class="stat-icon">{{ icon('drive', 16) }}</span>
+      <div><strong>MinIO</strong><small>S3 object, file gốc</small>
+        <dl class="mini"><dt>object</dt><dd class="mono">{{ document.object_name }}</dd><dt>size</dt><dd>{{ document.size_bytes|filesize }}</dd></dl></div>
+    </li>
+    <li>
+      <span class="stat-icon">{{ icon('braces', 16) }}</span>
+      <div><strong>MongoDB</strong><small>collection <code>document_details</code></small>
+        <dl class="mini"><dt>fields</dt><dd class="mono">{{ mongo_document.keys()|join(', ') }}</dd></dl></div>
+    </li>
+  </ul>
+</aside>
+{% endblock %}

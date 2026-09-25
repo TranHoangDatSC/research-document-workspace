@@ -11,11 +11,27 @@ from pydantic import ValidationError
 from app.api.health import health_ready
 from app.schemas.projects import ProjectCreate
 from app.services import projects, documents
+from app.ui.icons import icon, filesize, fmt_datetime, pretty_json
 
 router = APIRouter(include_in_schema=False)
 templates = Jinja2Templates(directory=str(Path(__file__).resolve().parents[1] / "templates"))
+templates.env.globals["icon"] = icon
+templates.env.filters["filesize"] = filesize
+templates.env.filters["dt"] = fmt_datetime
+templates.env.filters["pretty_json"] = pretty_json
+
+# Fields stored in PostgreSQL; everything else in a merged document comes from MongoDB.
+SQL_FIELDS = {"id", "project_id", "original_name", "object_name", "content_type", "size_bytes", "status", "created_at"}
+
+def sidebar_projects():
+    # Navigation must never break a page: on any storage error show an empty list.
+    try:
+        return projects.list_projects(50, 0)
+    except Exception:
+        return []
 
 def render(request, name, status_code=200, **context):
+    context.setdefault("sidebar_projects", sidebar_projects())
     return templates.TemplateResponse(request=request, name=name, context=context, status_code=status_code)
 
 def error_page(request, status, message):
@@ -37,7 +53,8 @@ def create_project(request: Request, name: Annotated[str, Form(max_length=200)] 
 
 @router.get("/ui/projects/{project_id}")
 def project_page(request: Request, project_id: UUID, offset: int = Query(default=0, ge=0)):
-    return render(request, "project_detail.html", project=projects.get_project(project_id), documents=documents.list_documents(project_id, 20, offset), offset=offset)
+    project = projects.get_project(project_id)
+    return render(request, "project_detail.html", project=project, active_project_id=project["id"], documents=documents.list_documents(project_id, 20, offset), offset=offset)
 
 @router.post("/ui/projects/{project_id}/documents")
 def upload(request: Request, project_id: UUID, file: Annotated[UploadFile, File()], tags: Annotated[str, Form(max_length=5000)] = "", authors: Annotated[str, Form(max_length=5000)] = "", custom_metadata: Annotated[str, Form(max_length=16000)] = "{}"):
@@ -47,12 +64,14 @@ def upload(request: Request, project_id: UUID, file: Annotated[UploadFile, File(
 @router.get("/ui/documents/{document_id}")
 def document_page(request: Request, document_id: UUID):
     row = documents.get_document(document_id)
-    return render(request, "document_detail.html", document=row, project=projects.get_project(row["project_id"]))
+    project = projects.get_project(row["project_id"])
+    mongo_document = {k: v for k, v in row.items() if k not in SQL_FIELDS}
+    return render(request, "document_detail.html", document=row, project=project, active_project_id=project["id"], mongo_document=mongo_document)
 
 @router.get("/ui/documents/{document_id}/delete")
 def confirm_delete(request: Request, document_id: UUID):
     row = documents.document_row(document_id)
-    return render(request, "delete.html", document=row)
+    return render(request, "delete.html", document=row, active_project_id=row["project_id"])
 
 @router.post("/ui/documents/{document_id}/delete")
 def delete(request: Request, document_id: UUID, confirm: Annotated[str, Form()] = ""):

@@ -1,3 +1,88 @@
-{% extends "base.html" %}{% block content %}<a href="/">← Tất cả dự án</a><h1>{{ project.name }}</h1><p class="muted">{{ project.description or 'Chưa có mô tả' }}</p>
-<section class="panel"><h2>Thêm tài liệu</h2><form method="post" action="/ui/projects/{{ project.id }}/documents" enctype="multipart/form-data"><label>File (.txt, .pdf, .docx · tối đa 10 MiB)<input name="file" type="file" required accept=".txt,.pdf,.docx"></label><div class="grid"><label>Tags, cách nhau bởi dấu phẩy<input name="tags" maxlength="5000" placeholder="cloud,docker"></label><label>Tác giả, cách nhau bởi dấu phẩy<input name="authors" maxlength="5000"></label></div><label>Metadata bổ sung (JSON object)<textarea name="custom_metadata" maxlength="16000" rows="2">{}</textarea></label><button>Tải tài liệu lên</button></form></section>
-<section class="panel"><h2>Tài liệu</h2><div class="table-wrap"><table><thead><tr><th>Tên file</th><th>Kích thước</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody>{% for doc in documents %}<tr><td>{{ doc.original_name }}<small>{{ doc.created_at }}</small></td><td>{{ doc.size_bytes }} bytes</td><td><span class="badge {{ doc.status }}">{{ doc.status }}</span></td><td>{% if doc.status == 'ready' %}<a href="/ui/documents/{{ doc.id }}">Chi tiết</a> · <a href="/documents/{{ doc.id }}/download">Tải về</a> · {% endif %}{% if doc.status != 'pending' %}<a class="danger-link" href="/ui/documents/{{ doc.id }}/delete">{{ 'Thử xóa lại' if doc.status == 'deleting' else 'Xóa' }}</a>{% endif %}</td></tr>{% else %}<tr><td colspan="4">Chưa có tài liệu.</td></tr>{% endfor %}</tbody></table></div><div class="pager">{% if offset > 0 %}<a href="?offset={{ [0, offset-20]|max }}">← Trang trước</a>{% endif %}{% if documents|length == 20 %}<a href="?offset={{ offset+20 }}">Trang sau →</a>{% endif %}</div></section>{% endblock %}
+{% extends "base.html" %}
+{% block title %}{{ project.name }} · Research Document Workspace{% endblock %}
+{% block crumbs %}<a href="/">Dự án</a>{{ icon('chevron-right', 14) }}<span class="crumb-current">{{ project.name }}</span>{% endblock %}
+{% block content %}
+<div class="page-head">
+  <p class="eyebrow">Dự án</p>
+  <h1>{{ project.name }}</h1>
+  <p class="muted lead">{{ project.description or 'Chưa có mô tả' }}</p>
+</div>
+
+<section class="stat-row" aria-label="Thống kê trang hiện tại">
+  <div class="stat-card"><span class="stat-icon">{{ icon('file', 18) }}</span><div><strong>{{ documents|length }}</strong><small>tài liệu trong trang này</small></div></div>
+  <div class="stat-card"><span class="stat-icon">{{ icon('drive', 18) }}</span><div><strong>{{ documents|sum(attribute='size_bytes')|filesize }}</strong><small>dung lượng trong trang này</small></div></div>
+  <div class="stat-card"><span class="stat-icon">{{ icon('clock', 18) }}</span><div><strong>{{ project.created_at|dt }}</strong><small>ngày tạo dự án</small></div></div>
+</section>
+
+<section class="card">
+  <div class="card-head"><h2>Thêm tài liệu</h2><span class="muted small-text">.txt · .pdf · .docx · tối đa 10 MiB</span></div>
+  <form method="post" action="/ui/projects/{{ project.id }}/documents" enctype="multipart/form-data" class="stack">
+    <label class="dropzone" id="dropzone">
+      <input name="file" type="file" required accept=".txt,.pdf,.docx" id="file-input">
+      <span class="dropzone-icon">{{ icon('upload', 24) }}</span>
+      <span class="dropzone-text"><strong id="file-label">Chọn file hoặc kéo thả vào đây</strong><small id="file-hint">File (.txt, .pdf, .docx · tối đa 10 MiB)</small></span>
+    </label>
+    <div class="form-grid">
+      <label class="field">Tags, cách nhau bởi dấu phẩy
+        <input name="tags" maxlength="5000" placeholder="cloud,docker">
+      </label>
+      <label class="field">Tác giả, cách nhau bởi dấu phẩy
+        <input name="authors" maxlength="5000">
+      </label>
+    </div>
+    <label class="field">Metadata bổ sung (JSON object)
+      <textarea name="custom_metadata" maxlength="16000" rows="2" class="mono" spellcheck="false">{}</textarea>
+    </label>
+    <div><button class="btn primary">{{ icon('upload', 16) }}Tải tài liệu lên</button></div>
+  </form>
+</section>
+
+<section class="card">
+  <div class="card-head"><h2>Tài liệu</h2></div>
+  {% if documents %}
+  <div class="table-wrap">
+    <table class="doc-table">
+      <thead><tr><th>Tên file</th><th>Kích thước</th><th>Trạng thái</th><th class="right">Thao tác</th></tr></thead>
+      <tbody>
+        {% for doc in documents %}
+        <tr>
+          <td>
+            <div class="file-cell">
+              <span class="file-icon">{{ icon('file', 18) }}</span>
+              <div>
+                {% if doc.status == 'ready' %}<a class="file-name" href="/ui/documents/{{ doc.id }}">{{ doc.original_name }}</a>{% else %}<span class="file-name">{{ doc.original_name }}</span>{% endif %}
+                <small>{{ doc.created_at|dt }}</small>
+              </div>
+            </div>
+          </td>
+          <td class="nowrap">{{ doc.size_bytes|filesize }}</td>
+          <td><span class="badge {{ doc.status }}">{{ doc.status }}</span></td>
+          <td class="right">
+            <div class="row-actions">
+              {% if doc.status == 'ready' %}
+              <a class="btn ghost sm" href="/ui/documents/{{ doc.id }}">Chi tiết</a>
+              <a class="btn ghost sm" href="/documents/{{ doc.id }}/download">{{ icon('download', 14) }}Tải về</a>
+              {% endif %}
+              {% if doc.status != 'pending' %}
+              <a class="btn ghost sm danger-text" href="/ui/documents/{{ doc.id }}/delete">{% if doc.status == 'deleting' %}{{ icon('refresh', 14) }}Thử xóa lại{% else %}{{ icon('trash', 14) }}Xóa{% endif %}</a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">
+    <span class="empty-icon">{{ icon('file', 28) }}</span>
+    <p><strong>Chưa có tài liệu.</strong></p>
+    <p class="muted">Tải file đầu tiên lên ở khung phía trên.</p>
+  </div>
+  {% endif %}
+  <div class="pager">
+    {% if offset > 0 %}<a href="?offset={{ [0, offset-20]|max }}">← Trang trước</a>{% endif %}
+    {% if documents|length == 20 %}<a href="?offset={{ offset+20 }}">Trang sau →</a>{% endif %}
+  </div>
+</section>
+{% endblock %}

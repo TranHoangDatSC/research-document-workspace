@@ -8,21 +8,21 @@ Unknown document HTML: PASS
 Create project UI: PASS
 Project HTML: PASS
 Upload UI redirect: PASS
-GET /documents/2a11131f-c783-48d4-9301-5a96635de254: PASS
+GET /documents/4b4a38c9-e10d-4743-a36f-d26837379a83: PASS
 Upload UI redirect: PASS
-GET /documents/c80cb147-2306-4cdf-8de6-d393ba3bdf13: PASS
+GET /documents/0e904b44-1bcc-4a34-8ab2-6117bcc78273: PASS
 Deletion confirmation page: PASS
 Deletion requires confirmation: PASS
 Delete UI: PASS
 404 after delete: PASS
 Repeated DELETE is idempotent: PASS
-Absent from all 3 stores: c80cb147-2306-4cdf-8de6-d393ba3bdf13: PASS
+Absent from all 3 stores: 0e904b44-1bcc-4a34-8ab2-6117bcc78273: PASS
 Upload UI redirect: PASS
-GET /documents/46e0d759-c579-48b0-8c87-1388af46cb56: PASS
+GET /documents/f7d1accc-ed29-4752-9c09-16af4340ac38: PASS
 Document HTML: PASS
-GET /documents/2a11131f-c783-48d4-9301-5a96635de254: PASS
+GET /documents/4b4a38c9-e10d-4743-a36f-d26837379a83: PASS
 Aggregated metadata: PASS
 Download SHA256: PASS
 Download filename: PASS
-Present in all 3 stores: 2a11131f-c783-48d4-9301-5a96635de254: PASS
+Present in all 3 stores: 4b4a38c9-e10d-4743-a36f-d26837379a83: PASS
 DAY 3 BEFORE: PASS

@@ -1,16 +1,16 @@
 GET /health/ready: PASS
 Readiness after recreation: PASS
-GET /projects/31d662e3-1248-486b-a58a-0ca6eb81310d: PASS
+GET /projects/7ac306ab-d238-42a0-88fc-7a4a3fd99ef1: PASS
 Same project persists: PASS
 Project HTML after recreation: PASS
 Document HTML: PASS
-GET /documents/2a11131f-c783-48d4-9301-5a96635de254: PASS
+GET /documents/4b4a38c9-e10d-4743-a36f-d26837379a83: PASS
 Aggregated metadata: PASS
 Download SHA256: PASS
 Download filename: PASS
-Present in all 3 stores: 2a11131f-c783-48d4-9301-5a96635de254: PASS
+Present in all 3 stores: 4b4a38c9-e10d-4743-a36f-d26837379a83: PASS
 Deleted document stays absent: PASS
-Absent from all 3 stores: c80cb147-2306-4cdf-8de6-d393ba3bdf13: PASS
+Absent from all 3 stores: 0e904b44-1bcc-4a34-8ab2-6117bcc78273: PASS
 Deleted document stays absent: PASS
-Absent from all 3 stores: 46e0d759-c579-48b0-8c87-1388af46cb56: PASS
+Absent from all 3 stores: f7d1accc-ed29-4752-9c09-16af4340ac38: PASS
 DAY 3 AFTER: PASS
