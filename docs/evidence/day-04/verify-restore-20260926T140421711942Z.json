@@ -1,0 +1,16 @@
+{
+  "started_at": "2026-09-26T14:04:21.711118+00:00",
+  "project": "rdw-restore-day4",
+  "status": "RESTORE_CROSS_STORE_PASS",
+  "checks": {
+    "ok": true,
+    "projects": 10,
+    "documents": 15,
+    "ready_documents": 12,
+    "other_documents": 3,
+    "mongodb_metadata": 12,
+    "minio_objects": 12,
+    "verified_linked_downloads": 12
+  },
+  "finished_at": "2026-09-26T14:04:27.888108+00:00"
+}

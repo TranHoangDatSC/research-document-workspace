@@ -1,0 +1,29 @@
+{
+  "started_at": "2026-09-26T12:56:05.367156+00:00",
+  "scope": {
+    "postgres_database": "research_document_workspace",
+    "mongo_database": "research_document_workspace",
+    "minio_bucket": "research-documents-workspace"
+  },
+  "status": "BACKUP_CREATED",
+  "restore_verified": false,
+  "files": {
+    "postgres.dump": {
+      "bytes": 6822,
+      "sha256": "177f0ffa644f111b93159e04a29192e9ef7b83365f4ca1428250536884232ebe"
+    },
+    "mongo.archive.gz": {
+      "bytes": 2280,
+      "sha256": "283aac11664c9e12d2965822ccbc0b78909c78aaac7a1330d34014225e15bdec"
+    },
+    "minio.tar": {
+      "bytes": 81920,
+      "sha256": "6f4c240f516d7c7f760e705db8a2954c4c5c164def3859b6dcdaa798230b987e"
+    }
+  },
+  "minio_object_count": 12,
+  "web_recovered": true,
+  "finished_at": "2026-09-26T12:56:20.135069+00:00",
+  "backup_error": null,
+  "recovery_error": null
+}

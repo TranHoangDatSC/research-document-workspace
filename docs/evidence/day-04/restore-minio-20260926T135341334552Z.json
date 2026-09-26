@@ -1,0 +1,77 @@
+{
+  "started_at": "2026-09-26T13:53:41.334381+00:00",
+  "project": "rdw-restore-day4",
+  "status": "MINIO_RESTORE_PASS",
+  "container_id": "2de2e6a2706c14f32115259c17b58137e62847e10d194786114c32f34c4854ac",
+  "volume": "rdw-restore-day4_minio_data",
+  "result": {
+    "ok": true,
+    "bucket": "research-documents-workspace",
+    "archive_sha256": "6f4c240f516d7c7f760e705db8a2954c4c5c164def3859b6dcdaa798230b987e",
+    "restored_objects": 12,
+    "verified_downloads": 12,
+    "objects": [
+      {
+        "key": "documents/029207bd-6c11-49de-b396-ef90a897a9d2/original.txt",
+        "bytes": 213,
+        "sha256": "3af4aff3fda6f29f47178f6dcac135a960c2783966be90b9f565a674a6cbc9d5"
+      },
+      {
+        "key": "documents/2a11131f-c783-48d4-9301-5a96635de254/original.txt",
+        "bytes": 47,
+        "sha256": "ca7b24b3417d9d1e17da74ee7aecc4ad8354c476af0b5751ee9fefd68a5ddcf2"
+      },
+      {
+        "key": "documents/45063e63-8b3a-45bf-8bec-b1f2fce3dea4/original.txt",
+        "bytes": 213,
+        "sha256": "3af4aff3fda6f29f47178f6dcac135a960c2783966be90b9f565a674a6cbc9d5"
+      },
+      {
+        "key": "documents/4b4a38c9-e10d-4743-a36f-d26837379a83/original.txt",
+        "bytes": 47,
+        "sha256": "512e924af25710e1c711825216885daec59f3c27bd83043538afd6e2defce6ac"
+      },
+      {
+        "key": "documents/5402bf31-5949-435b-b02c-1a9a0b00e370/original.txt",
+        "bytes": 175,
+        "sha256": "6add91f71d6d2656ff283f58f8dbde290c32cb7d00127928edcfab0e5b4dc6d5"
+      },
+      {
+        "key": "documents/5c7a7f5e-d203-4010-a84d-256b2dae275d/original.docx",
+        "bytes": 33163,
+        "sha256": "45a3f2b426b22a0b6de5c1a72c60a0048a78a359c8e206a92e196da2532e51f5"
+      },
+      {
+        "key": "documents/60517e4f-803d-413c-8b00-360e3922cfc3/original.txt",
+        "bytes": 213,
+        "sha256": "3af4aff3fda6f29f47178f6dcac135a960c2783966be90b9f565a674a6cbc9d5"
+      },
+      {
+        "key": "documents/6d24286a-b50c-486b-bc01-e370ceff0674/original.txt",
+        "bytes": 175,
+        "sha256": "6add91f71d6d2656ff283f58f8dbde290c32cb7d00127928edcfab0e5b4dc6d5"
+      },
+      {
+        "key": "documents/88cddb0b-89a0-472c-8164-89ffe1ac1e7b/original.docx",
+        "bytes": 31391,
+        "sha256": "f38a59faab226423f852c0be34d40b635b37328eb2e90d17d4c5812005766be3"
+      },
+      {
+        "key": "documents/9585058e-7476-47d0-b672-cd96dd0336bc/original.txt",
+        "bytes": 213,
+        "sha256": "3af4aff3fda6f29f47178f6dcac135a960c2783966be90b9f565a674a6cbc9d5"
+      },
+      {
+        "key": "documents/affd6d4c-9ff8-43ce-b596-8bb6d56b3e2e/original.txt",
+        "bytes": 175,
+        "sha256": "6add91f71d6d2656ff283f58f8dbde290c32cb7d00127928edcfab0e5b4dc6d5"
+      },
+      {
+        "key": "documents/cc11d673-e611-43bf-ae71-30a384e85824/original.txt",
+        "bytes": 175,
+        "sha256": "6add91f71d6d2656ff283f58f8dbde290c32cb7d00127928edcfab0e5b4dc6d5"
+      }
+    ]
+  },
+  "finished_at": "2026-09-26T13:53:45.911081+00:00"
+}

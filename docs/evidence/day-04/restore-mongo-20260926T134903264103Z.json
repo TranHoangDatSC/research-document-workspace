@@ -1,0 +1,19 @@
+{
+  "started_at": "2026-09-26T13:49:03.262527+00:00",
+  "project": "rdw-restore-day4",
+  "database": "research_document_workspace",
+  "status": "MONGO_RESTORE_PASS",
+  "archive_sha256": "283aac11664c9e12d2965822ccbc0b78909c78aaac7a1330d34014225e15bdec",
+  "container_id": "ad54a18c9d0f982ae57acfec0ac867b8e87450096de615628a1917dbf84d27c7",
+  "volume": "rdw-restore-day4_mongo_data",
+  "collections": [
+    "checkpoint_c",
+    "document_details"
+  ],
+  "checks": {
+    "metadata_count": 12,
+    "unique_document_id_index": true,
+    "invalid_document_ids": 0
+  },
+  "finished_at": "2026-09-26T13:49:10.809733+00:00"
+}
