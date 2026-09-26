@@ -1,23 +1,14 @@
-name: research-document-workspace
-
 services:
-  web:
-    build: .
-    image: research-document-workspace:dev
-    env_file:
-      - .env
-    ports:
-      - "127.0.0.1:8001:8000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      mongo:
-        condition: service_healthy
-      minio:
-        condition: service_healthy
+  postgres:
+    image: postgres:16-bookworm
+    environment:
+      POSTGRES_DB: research_document_workspace
+      POSTGRES_USER: ${POSTGRES_USER:?Missing POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Missing POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     cpus: "1.0"
     mem_limit: 512m
-    restart: unless-stopped
     logging:
       driver: json-file
       options:
@@ -25,33 +16,8 @@ services:
         max-file: "3"
     healthcheck:
       test:
-        - CMD
-        - python
-        - -c
-        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=15)"
-      interval: 10s
-      timeout: 20s
-      retries: 12
-      start_period: 30s
-
-  postgres:
-    image: postgres:16-bookworm
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:?Missing POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER:?Missing POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Missing POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    cpus: "1.0"
-    mem_limit: 512m
-    restart: unless-stopped
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
       interval: 5s
       timeout: 5s
       retries: 20
@@ -66,14 +32,18 @@ services:
       - mongo_config:/data/configdb
     cpus: "2.0"
     mem_limit: 1g
-    restart: unless-stopped
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - --eval
+        - db.adminCommand('ping').ok
       interval: 5s
       timeout: 10s
       retries: 20
@@ -84,24 +54,35 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Missing MinIO username}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Missing MinIO password}
-    ports:
-      - "127.0.0.1:9000:9000"
-      - "127.0.0.1:9001:9001"
     volumes:
       - minio_data:/data
     cpus: "1.0"
     mem_limit: 1g
-    restart: unless-stopped
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9000/minio/health/live"]
+      test:
+        - CMD
+        - curl
+        - -fsS
+        - http://127.0.0.1:9000/minio/health/live
       interval: 5s
       timeout: 5s
       retries: 20
+
+  restore_tools:
+    image: research-document-workspace:dev
+    profiles: ["restore-tools"]
+    entrypoint: ["python"]
+    env_file:
+      - .env
+    volumes:
+      - ./artifacts/backups:/backups:ro
+    cpus: "1.0"
+    mem_limit: 512m
 
 volumes:
   postgres_data:
