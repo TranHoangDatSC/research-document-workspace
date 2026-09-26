@@ -1,6 +1,0 @@
-{% extends "base.html" %}{% block content %}
-<p class="eyebrow">THƯ VIỆN NGHIÊN CỨU</p><h1>Tài liệu của bạn,<br>trong cùng một không gian.</h1><p class="muted">Tạo dự án, lưu tài liệu và theo dõi thông tin nghiên cứu.</p>
-<div class="statusbar" aria-label="Trạng thái hệ thống">{% for name, state in health.services.items() %}<span class="badge {{ state }}">{{ name }}: {{ state }}</span>{% endfor %}</div>
-<div class="grid"><section class="panel"><h2>Dự án</h2>{% for project in projects %}<a class="project" href="/ui/projects/{{ project.id }}"><strong>{{ project.name }}</strong><p>{{ project.description or 'Chưa có mô tả' }}</p><small>{{ project.created_at }}</small></a>{% else %}<p>Chưa có dự án. Tạo dự án đầu tiên bằng biểu mẫu bên cạnh.</p>{% endfor %}<div class="pager">{% if offset > 0 %}<a href="/?offset={{ [0, offset-20]|max }}">← Trang trước</a>{% endif %}{% if projects|length == 20 %}<a href="/?offset={{ offset+20 }}">Trang sau →</a>{% endif %}</div></section>
-<section class="panel"><h2>Tạo dự án</h2><form method="post" action="/ui/projects"><label>Tên dự án<input name="name" required maxlength="200" placeholder="Ví dụ: Cloud Research"></label><label>Mô tả<textarea name="description" maxlength="5000" rows="5"></textarea></label><button>Tạo dự án</button></form></section></div>
-{% endblock %}
